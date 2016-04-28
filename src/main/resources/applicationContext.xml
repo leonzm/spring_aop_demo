@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.1.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
+
+    <bean id="beforeAdvice" class="com.google.spring_aop_demo.AopAdvice"></bean>  <!-- 切面类 -->
+	<bean id="busiTarget" class="com.google.spring_aop_demo.BusiImpl"></bean>  <!-- 业务实现 -->
+
+	<bean id="busiAop" class="org.springframework.aop.framework.ProxyFactoryBean">  <!-- 代理类.调用的时候则是调用这个代理类 -->
+		<property name="proxyInterfaces">  <!-- 代理接口（业务类接口） -->
+			<value>com.google.spring_aop_demo.BusiInterface</value>
+		</property>
+		<property name="interceptorNames">  <!-- 通知 -->
+			<list>
+				<value>beforeAdvisor</value>
+			</list>
+		</property>
+		<property name="target">  <!-- 业务实现类 -->
+			<ref bean="busiTarget"/>
+		</property>
+	</bean>
+	
+	<bean id="pointCut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">  <!-- 切点 -->
+		<property name="pattern" value=".*doBusiTo"/>  <!-- 需要对那些方法进行拦截 -->
+	</bean>
+	
+	<bean id="beforeAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">  <!-- 通知 -->
+		<property name="advice" ref="beforeAdvice" />
+		<property name="pointcut" ref="pointCut" />
+	</bean>
+
+</beans>
